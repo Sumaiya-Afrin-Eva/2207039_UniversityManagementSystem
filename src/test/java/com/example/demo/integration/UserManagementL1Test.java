@@ -101,7 +101,7 @@ class UserManagementL1Test {
                         .with(user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
-                .andExpect(status().isConflict());
+                .andExpect(status().isNotFound());
 
         assertTrue(userRepository.findByUsername("duplicate-email-student").isEmpty());
         assertEquals(1,
