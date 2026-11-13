@@ -1,23 +1,38 @@
 name: University Management System CI
 
-run-name: ${{ github.event.head_commit.message || github.event.pull_request.title || 'Manual test run' }}
+run-name: ${{ github.event.head_commit.message || 'Individual 9 Tests Run' }}
 
 on:
   push:
   pull_request:
   workflow_dispatch:
 
-permissions:
-  contents: read
-
-concurrency:
-  group: university-management-ci-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  test:
-    name: Build and test (Java 25)
+  run-9-tests:
+    name: ${{ matrix.test_name }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - test_name: "Unit 1: Find By Role"
+            test_method: "UserServiceTest#findByRoleReturnsResponsesForMatchingRole"
+          - test_name: "Unit 2: Reject Different Role"
+            test_method: "UserServiceTest#findRejectsUserWithDifferentRole"
+          - test_name: "Unit 3: Create & Encode Password"
+            test_method: "UserServiceTest#createNormalizesFieldsAndEncodesPassword"
+          - test_name: "Unit 4: Reject Student Without ID"
+            test_method: "UserServiceTest#createRejectsStudentWithoutStudentId"
+          - test_name: "Unit 5: Update Profile Keep Password"
+            test_method: "UserServiceTest#updateChangesProfileAndKeepsPasswordWhenNoNewPasswordIsProvided"
+          - test_name: "Unit 6: Delete User"
+            test_method: "UserServiceTest#deleteRemovesUserOfRequestedRole"
+          - test_name: "Integration 1: Admin Creates Student"
+            test_method: "UserManagementL1Test#adminCreatesStudentAndPersistsEncodedCredentials"
+          - test_name: "Integration 2: Student Reads Students"
+            test_method: "UserManagementL1Test#studentCanReadStudentsFromTheDatabase"
+          - test_name: "Integration 3: Reject Duplicate Email"
+            test_method: "UserManagementL1Test#duplicateEmailIsRejectedWithoutPersistingTheNewUser"
 
     steps:
       - name: Checkout repository
@@ -34,40 +49,5 @@ jobs:
       - name: Grant execute permission for mvnw
         run: chmod +x mvnw
 
-      # --- ৬টি ইউনিট টেস্ট (UserServiceTest) আলাদাভাবে রান ---
-      - name: Unit Test 1 - Find By Role
-        run: ./mvnw --batch-mode --no-transfer-progress test -Dtest=UserServiceTest#findByRoleReturnsResponsesForMatchingRole
-
-      - name: Unit Test 2 - Reject Different Role
-        run: ./mvnw --batch-mode --no-transfer-progress test -Dtest=UserServiceTest#findRejectsUserWithDifferentRole
-
-      - name: Unit Test 3 - Create User & Encode Password
-        run: ./mvnw --batch-mode --no-transfer-progress test -Dtest=UserServiceTest#createNormalizesFieldsAndEncodesPassword
-
-      - name: Unit Test 4 - Reject Student Without ID
-        run: ./mvnw --batch-mode --no-transfer-progress test -Dtest=UserServiceTest#createRejectsStudentWithoutStudentId
-
-      - name: Unit Test 5 - Update Profile Keep Password
-        run: ./mvnw --batch-mode --no-transfer-progress test -Dtest=UserServiceTest#updateChangesProfileAndKeepsPasswordWhenNoNewPasswordIsProvided
-
-      - name: Unit Test 6 - Delete User
-        run: ./mvnw --batch-mode --no-transfer-progress test -Dtest=UserServiceTest#deleteRemovesUserOfRequestedRole
-
-      # --- ৩টি ইন্টিগ্রেশন টেস্ট (UserManagementL1Test) আলাদাভাবে রান ---
-      # --- ৩টি ইন্টিগ্রেশন টেস্ট (UserManagementL1Test) আলাদাভাবে রান ---
-      - name: Integration Test 1 - Admin Creates Student
-        run: ./mvnw --batch-mode --no-transfer-progress test -Dtest=UserManagementL1Test#adminCreatesStudentAndPersistsEncodedCredentials
-
-      - name: Integration Test 2 - Student Reads Students
-        run: ./mvnw --batch-mode --no-transfer-progress test -Dtest=UserManagementL1Test#studentCanReadStudentsFromTheDatabase
-
-      - name: Integration Test 3 - Reject Duplicate Email
-        run: ./mvnw --batch-mode --no-transfer-progress test -Dtest=UserManagementL1Test#duplicateEmailIsRejectedWithoutPersistingTheNewUser
-      
-      - name: Upload test reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: maven-test-reports
-          path: "target/surefire-reports/"
-          if-no-files-found: ignore
+      - name: Run ${{ matrix.test_name }}
+        run: ./mvnw --batch-mode --no-transfer-progress test -Dtest=${{ matrix.test_method }}
