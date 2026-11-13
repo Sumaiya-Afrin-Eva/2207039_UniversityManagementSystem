@@ -54,15 +54,16 @@ jobs:
         run: ./mvnw --batch-mode --no-transfer-progress test -Dtest=UserServiceTest#deleteRemovesUserOfRequestedRole
 
       # --- ৩টি ইন্টিগ্রেশন টেস্ট (UserManagementL1Test) আলাদাভাবে রান ---
+      # --- ৩টি ইন্টিগ্রেশন টেস্ট (UserManagementL1Test) আলাদাভাবে রান ---
       - name: Integration Test 1 - Admin Creates Student
         run: ./mvnw --batch-mode --no-transfer-progress test -Dtest=UserManagementL1Test#adminCreatesStudentAndPersistsEncodedCredentials
 
-      - name: Integration Test 2 - Teacher Reads Students
-        run: ./mvnw --batch-mode --no-transfer-progress test -Dtest=UserManagementL1Test#teacherCanReadStudentsFromTheDatabase
+      - name: Integration Test 2 - Student Reads Students
+        run: ./mvnw --batch-mode --no-transfer-progress test -Dtest=UserManagementL1Test#studentCanReadStudentsFromTheDatabase
 
       - name: Integration Test 3 - Reject Duplicate Email
         run: ./mvnw --batch-mode --no-transfer-progress test -Dtest=UserManagementL1Test#duplicateEmailIsRejectedWithoutPersistingTheNewUser
-
+      
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4

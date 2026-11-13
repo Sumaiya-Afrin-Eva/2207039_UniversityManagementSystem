@@ -76,9 +76,9 @@ class UserManagementL1Test {
     }
 
     @Test
-    void teacherCanReadStudentsFromTheDatabase() throws Exception {
+    void studentCanReadStudentsFromTheDatabase() throws Exception {
         mockMvc.perform(get("/api/students")
-                        .with(user("teacher").roles("TEACHER")))
+                        .with(user("student").roles("STUDENT")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.username == 'student')].fullName").value(Matchers.contains("Alex Johnson")))
                 .andExpect(jsonPath("$[?(@.username == 'student')].role").value(Matchers.contains("STUDENT")));
