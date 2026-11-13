@@ -45,7 +45,7 @@ class UserServiceTest {
 
         List<UserResponse> results = userService.findByRole(Role.STUDENT);
 
-        assertEquals(99,
+        assertEquals(1,
                 results.size());
         assertEquals(student.getId(),
                 results.getFirst().id());
