@@ -1,3 +1,4 @@
+
 name: University Management System CI/CD
 
 run-name: ${{ github.event.head_commit.message || 'Manual test run' }}
@@ -14,6 +15,26 @@ jobs:
   test:
     name: Build and test (Java 25)
     runs-on: ubuntu-24.04
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: university_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        ports:
+          - "5432:5432"
+        options: >-
+          --health-cmd "pg_isready -U postgres -d university_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/university_test
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
 
     steps:
       - name: Checkout repository
