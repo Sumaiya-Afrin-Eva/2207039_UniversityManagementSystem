@@ -32,3 +32,9 @@ jobs:
 
       - name: Run all tests
         run: ./mvnw --batch-mode --no-transfer-progress test
+
+      - name: Run Unit Tests
+        run: ./mvnw --batch-mode --no-transfer-progress test -Dtest=UserServiceTest
+
+      - name: Run Integration Tests
+        run: ./mvnw --batch-mode --no-transfer-progress test -Dtest=UserManagementL1Test
